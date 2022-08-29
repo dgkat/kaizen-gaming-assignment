@@ -1,2 +1,0 @@
-package com.dgkatoudis.kaizengamingassignment.presentation.mainscreen
-
