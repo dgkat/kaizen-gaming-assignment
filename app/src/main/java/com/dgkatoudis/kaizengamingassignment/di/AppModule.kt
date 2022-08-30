@@ -1,11 +1,15 @@
 package com.dgkatoudis.kaizengamingassignment.di
 
+import android.app.Application
+import com.dgkatoudis.kaizengamingassignment.data.mappers.RemoteToDomainSportEventsMapper
+import com.dgkatoudis.kaizengamingassignment.data.mappers.RemoteToDomainSportsMapper
 import com.dgkatoudis.kaizengamingassignment.data.repository.SportRepositoryImpl
 import com.dgkatoudis.kaizengamingassignment.domain.repository.SportRepository
 import com.dgkatoudis.kaizengamingassignment.domain.usecases.GetSportsWithEvents
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.DateFormatter
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.SportsEventMapper
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.SportsMapper
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +20,7 @@ import dagger.hilt.components.SingletonComponent
 object AppModule {
 
     @Provides
-    fun provideDateFormatter():DateFormatter{
+    fun provideDateFormatter(): DateFormatter {
         return DateFormatter()
     }
 
@@ -26,16 +30,38 @@ object AppModule {
     }
 
     @Provides
-    fun provideSportsMapper(sportsEventMapper: SportsEventMapper):SportsMapper{
+    fun provideSportsMapper(sportsEventMapper: SportsEventMapper): SportsMapper {
         return SportsMapper(sportsEventMapper)
     }
 
     @Provides
-    fun provideGetSportsWithEvents(repository: SportRepository):GetSportsWithEvents{
+    fun provideGetSportsWithEvents(repository: SportRepository): GetSportsWithEvents {
         return GetSportsWithEvents(repository)
     }
+
     @Provides
-    fun provideSportsRepository():SportRepository{
-        return SportRepositoryImpl()
+    fun provideSportsRepository(
+        moshi: Moshi,
+        context: Application,
+        remoteToDomainSportsMapper: RemoteToDomainSportsMapper
+    ): SportRepository {
+        return SportRepositoryImpl(moshi, context, remoteToDomainSportsMapper)
+    }
+
+    @Provides
+    fun provideMoshi(): Moshi {
+        return Moshi.Builder().build()
+    }
+
+    @Provides
+    fun provideRemoteToDomainSportEventMapper(): RemoteToDomainSportEventsMapper {
+        return RemoteToDomainSportEventsMapper()
+    }
+
+    @Provides
+    fun provideRemoteToDomainSportsMapper(
+        remoteToDomainSportEventsMapper: RemoteToDomainSportEventsMapper
+    ): RemoteToDomainSportsMapper {
+        return RemoteToDomainSportsMapper(remoteToDomainSportEventsMapper)
     }
 }
