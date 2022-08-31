@@ -8,7 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,13 +38,17 @@ fun SportScreen(
     viewModel: SportsViewModel = hiltViewModel()
 ) {
     ScaffoldWithTopBar(
-        viewModel.sports
+        onExpandIconClick = viewModel::setExpanded,
+        onFavoriteIconClick = viewModel::setFavorite,
+        sportList = viewModel.sportsList
     )
 }
 
 @Composable
 fun ScaffoldWithTopBar(
-    sports: SportsUiState
+    onExpandIconClick: (Int) -> Unit,
+    onFavoriteIconClick: (Int, Int) -> Unit,
+    sportList: List<UiSport>
 ) {
     Scaffold(
         topBar = {
@@ -73,8 +78,13 @@ fun ScaffoldWithTopBar(
                 contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(sports.data) { sport ->
-                    SportsRow(sport = sport)
+                itemsIndexed(sportList) { index, sport ->
+                    SportsRow(
+                        sport = sport,
+                        sportsIndex = index,
+                        onClick = onExpandIconClick,
+                        onFavoriteIconClick = onFavoriteIconClick
+                    )
                 }
 
             }
@@ -85,8 +95,11 @@ fun ScaffoldWithTopBar(
 @Composable
 fun SportsRow(
     sport: UiSport,
-    isExpanded: Boolean = true
+    sportsIndex: Int,
+    onClick: (Int) -> Unit,
+    onFavoriteIconClick: (Int, Int) -> Unit
 ) {
+    val listState = rememberLazyListState()
     var currentState by remember { mutableStateOf(sport.expanded) }
     val transition = updateTransition(currentState, label = "")
     val rotation by transition.animateFloat(label = "") { state ->
@@ -117,7 +130,7 @@ fun SportsRow(
                             else -> R.drawable.tennis_64
                         }
                     ),
-                    contentDescription = "expandMore",
+                    contentDescription = "sportIcon",
                     tint = MaterialTheme.colors.onPrimary
                 )
                 Text(
@@ -131,6 +144,7 @@ fun SportsRow(
             IconButton(
                 modifier = Modifier.align(Alignment.CenterEnd),
                 onClick = {
+                    onClick(sportsIndex)
                     currentState = if (currentState == SportsRowState.Expanded) {
                         SportsRowState.Collapsed
                     } else {
@@ -146,6 +160,7 @@ fun SportsRow(
             }
         }
 
+
         transition.AnimatedContent(
             transitionSpec = {
                 slideInVertically { height -> -height } + fadeIn() with
@@ -154,7 +169,7 @@ fun SportsRow(
         ) { expanded ->
             if (expanded == SportsRowState.Expanded) {
                 LazyRow(
-                    state = rememberLazyListState(),
+                    state = listState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)
@@ -162,12 +177,18 @@ fun SportsRow(
                     contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(items = sport.events,
-                        key = { sportEvent ->
-                            sportEvent.id
-                        })
-                    { sportEvent ->
-                        SportsEvent(teamName = UiTeams(sportEvent.team1, sportEvent.team2))
+                    itemsIndexed(
+                        items = sport.events,
+                        key = { index, _ ->
+                            index
+                        }
+                    ) { index, sportEvent ->
+                        SportsEvent(
+                            sportEvent = sportEvent,
+                            sportsIndex = sportsIndex,
+                            sportEventIndex = index,
+                            onFavoriteIconClick = onFavoriteIconClick
+                        )
                     }
                 }
             }
@@ -176,7 +197,13 @@ fun SportsRow(
 }
 
 @Composable
-fun SportsEvent(teamName: UiTeams) {
+fun SportsEvent(
+    modifier: Modifier = Modifier,
+    sportEvent: UiSportEvent,
+    sportsIndex: Int,
+    sportEventIndex: Int,
+    onFavoriteIconClick: (Int, Int) -> Unit
+) {
     Surface(
         modifier = Modifier,
         shape = RoundedCornerShape(16.dp),
@@ -188,17 +215,22 @@ fun SportsEvent(teamName: UiTeams) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Timer()
-            Favorite()
-            TeamName(teamName = teamName.team1)
-            TeamName(teamName = teamName.team2)
+            Timer(sportEvent.date)
+            Favorite(
+                isFavorite = sportEvent.isFavorite,
+                sportsIndex = sportsIndex,
+                sportEventIndex = sportEventIndex,
+                onFavoriteIconClick = onFavoriteIconClick
+            )
+            TeamName(teamName = sportEvent.team1)
+            TeamName(teamName = sportEvent.team2)
         }
     }
 
 }
 
 @Composable
-fun Timer() {
+fun Timer(date: String) {
     Text(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
@@ -208,21 +240,37 @@ fun Timer() {
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
-        text = "HH/MM/SS",
+        text = date,
         fontSize = 20.sp
     )
 
 }
 
 @Composable
-fun Favorite() {
-    Icon(
-        modifier = Modifier,
-        imageVector = Icons.Filled.Star,
-        contentDescription = "star",
-        tint = MaterialTheme.colors.onPrimary
-    )
-
+fun Favorite(
+    isFavorite: Boolean = false,
+    sportsIndex: Int,
+    sportEventIndex: Int,
+    onFavoriteIconClick: (Int, Int) -> Unit
+) {
+    IconButton(onClick = {
+        onFavoriteIconClick(sportsIndex, sportEventIndex)
+    }) {
+        Icon(
+            modifier = Modifier,
+            imageVector = if (isFavorite) {
+                Icons.Filled.Star
+            } else {
+                Icons.Outlined.Star
+            },
+            contentDescription = "star",
+            tint = if (isFavorite) {
+                Color.Yellow
+            } else {
+                MaterialTheme.colors.onPrimary
+            }
+        )
+    }
 }
 
 @Composable
