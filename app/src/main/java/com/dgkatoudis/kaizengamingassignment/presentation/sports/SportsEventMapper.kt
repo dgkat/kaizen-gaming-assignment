@@ -3,16 +3,23 @@ package com.dgkatoudis.kaizengamingassignment.presentation.sports
 import com.dgkatoudis.kaizengamingassignment.domain.model.SportEvent
 
 class SportsEventMapper(
-    private val dateFormatter : DateFormatter
+    private val dateFormatter: DateFormatter
 ) {
-    fun map(events : List<SportEvent>):List<UiSportEvent>{
+    fun map(events: List<SportEvent>): List<UiSportEvent> {
         return events.map {
+            val teams = getTeams(it.name)
             UiSportEvent(
                 id = it.id,
-                name = it.name,
+                team1 = teams.team1,
+                team2 = teams.team2,
                 sportId = it.sportId,
                 date = dateFormatter.format(it.epoch)
             )
         }
+    }
+
+    private fun getTeams(sportEventName: String): UiTeams {
+        val teams = sportEventName.split("-")
+        return UiTeams(team1 = teams[0].trim(), team2 = teams[1].trim())
     }
 }

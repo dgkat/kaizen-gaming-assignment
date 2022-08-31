@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dgkatoudis.kaizengamingassignment.domain.model.Resource
 import com.dgkatoudis.kaizengamingassignment.domain.usecases.GetSportsWithEvents
+import com.dgkatoudis.kaizengamingassignment.util.SportsRowState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,6 +19,10 @@ class SportsViewModel @Inject constructor(
 ) : ViewModel() {
 
     var sports by mutableStateOf(SportsUiState())
+        private set
+    var sportsList by mutableStateOf(SportsUiState())
+        private set
+    var sportEvents by mutableStateOf(SportsUiState())
         private set
 
     init {
@@ -32,4 +37,7 @@ class SportsViewModel @Inject constructor(
             }
         }
     }
+    /*fun setExpanded(index:Int){
+        sports=sports.copy(data = SportsUiState(List[index]=))
+    }*/
 }

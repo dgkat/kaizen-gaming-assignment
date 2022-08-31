@@ -1,4 +1,8 @@
 package com.dgkatoudis.kaizengamingassignment
 
-class KaizenGamingAssignmentApplication {
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
+class KaizenGamingAssignmentApplication:Application() {
 }
