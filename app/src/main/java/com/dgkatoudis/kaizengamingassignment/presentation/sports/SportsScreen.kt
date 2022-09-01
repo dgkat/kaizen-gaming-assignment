@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -25,9 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dgkatoudis.kaizengamingassignment.R
 import com.dgkatoudis.kaizengamingassignment.util.SportsRowState
@@ -40,7 +39,8 @@ fun SportScreen(
     ScaffoldWithTopBar(
         onExpandIconClick = viewModel::setExpanded,
         onFavoriteIconClick = viewModel::setFavorite,
-        sportList = viewModel.sportsList
+        sportList = viewModel.sportsList,
+        sportsUiState = viewModel.uiState.value
     )
 }
 
@@ -48,13 +48,14 @@ fun SportScreen(
 fun ScaffoldWithTopBar(
     onExpandIconClick: (Int) -> Unit,
     onFavoriteIconClick: (Int, Int) -> Unit,
-    sportList: List<UiSport>
+    sportList: List<UiSport>,
+    sportsUiState: SportsUiState
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "My App")
+                    Text(text = stringResource(R.string.top_app_bar_title))
                 },
                 actions = {
                     Row() {
@@ -66,27 +67,43 @@ fun ScaffoldWithTopBar(
                         }
                     }
                 },
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = Color.White,
+                backgroundColor = MaterialTheme.colors.secondary,
+                contentColor = MaterialTheme.colors.onSecondary,
                 elevation = 10.dp
             )
         }, content = {
-            LazyColumn(
-                state = rememberLazyListState(),
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                itemsIndexed(sportList) { index, sport ->
-                    SportsRow(
-                        sport = sport,
-                        sportsIndex = index,
-                        onClick = onExpandIconClick,
-                        onFavoriteIconClick = onFavoriteIconClick
-                    )
+            when (sportsUiState) {
+                SportsUiState.SUCCESS -> {
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        itemsIndexed(sportList) { index, sport ->
+                            SportsRow(
+                                sport = sport,
+                                sportsIndex = index,
+                                onClick = onExpandIconClick,
+                                onFavoriteIconClick = onFavoriteIconClick
+                            )
+                        }
+                    }
                 }
-
+                SportsUiState.LOADING -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+                SportsUiState.ERROR -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(R.string.data_load_error),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
             }
         })
 }
@@ -198,7 +215,6 @@ fun SportsRow(
 
 @Composable
 fun SportsEvent(
-    modifier: Modifier = Modifier,
     sportEvent: UiSportEvent,
     sportsIndex: Int,
     sportEventIndex: Int,
@@ -206,16 +222,16 @@ fun SportsEvent(
 ) {
     Surface(
         modifier = Modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
         elevation = 10.dp,
-        color = MaterialTheme.colors.secondary
+        color = MaterialTheme.colors.primary
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Timer(sportEvent.date)
+            Timer(sportEvent.date.toString())
             Favorite(
                 isFavorite = sportEvent.isFavorite,
                 sportsIndex = sportsIndex,
@@ -233,15 +249,15 @@ fun SportsEvent(
 fun Timer(date: String) {
     Text(
         modifier = Modifier
-            .clip(shape = RoundedCornerShape(8.dp))
+            .clip(shape = MaterialTheme.shapes.medium)
             .border(
                 width = 2.dp,
-                color = MaterialTheme.colors.onSecondary,
-                shape = RoundedCornerShape(8.dp)
+                color = MaterialTheme.colors.onPrimary,
+                shape = MaterialTheme.shapes.medium
             )
             .padding(8.dp),
         text = date,
-        fontSize = 20.sp
+        color = MaterialTheme.colors.onPrimary
     )
 
 }
@@ -280,7 +296,7 @@ fun TeamName(teamName: String) {
         text = teamName,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        fontSize = 20.sp
+        color = MaterialTheme.colors.onPrimary
     )
 }
 

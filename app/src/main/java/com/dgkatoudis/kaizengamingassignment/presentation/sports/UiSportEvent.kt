@@ -5,6 +5,6 @@ data class UiSportEvent(
     val team1: String,
     val team2: String,
     val sportId: String,
-    val date : String,
+    val date : Long,
     val isFavorite:Boolean = false
 )

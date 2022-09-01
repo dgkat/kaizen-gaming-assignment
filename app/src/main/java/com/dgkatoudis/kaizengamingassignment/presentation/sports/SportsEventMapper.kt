@@ -13,7 +13,7 @@ class SportsEventMapper(
                 team1 = teams.team1,
                 team2 = teams.team2,
                 sportId = it.sportId,
-                date = dateFormatter.format(it.epoch)
+                date = it.epoch
             )
         }
     }

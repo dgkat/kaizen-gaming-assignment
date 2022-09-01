@@ -5,6 +5,7 @@ import com.dgkatoudis.kaizengamingassignment.data.mappers.RemoteToDomainSportEve
 import com.dgkatoudis.kaizengamingassignment.data.mappers.RemoteToDomainSportsMapper
 import com.dgkatoudis.kaizengamingassignment.data.repository.SportRepositoryImpl
 import com.dgkatoudis.kaizengamingassignment.domain.repository.SportRepository
+import com.dgkatoudis.kaizengamingassignment.domain.usecases.CountdownTime
 import com.dgkatoudis.kaizengamingassignment.domain.usecases.GetSportsWithEvents
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.DateFormatter
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.SportsEventMapper
@@ -63,5 +64,10 @@ object AppModule {
         remoteToDomainSportEventsMapper: RemoteToDomainSportEventsMapper
     ): RemoteToDomainSportsMapper {
         return RemoteToDomainSportsMapper(remoteToDomainSportEventsMapper)
+    }
+
+    @Provides
+    fun provideCountdownTime():CountdownTime{
+        return CountdownTime()
     }
 }
