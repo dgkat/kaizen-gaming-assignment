@@ -5,24 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dgkatoudis.kaizengamingassignment.domain.model.Resource
-import com.dgkatoudis.kaizengamingassignment.domain.usecases.CountdownTime
 import com.dgkatoudis.kaizengamingassignment.domain.usecases.GetSportsWithEvents
 import com.dgkatoudis.kaizengamingassignment.util.SportsRowState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SportsViewModel @Inject constructor(
     private val getSportsWithEvents: GetSportsWithEvents,
-    private val domainToUiSportsMapper: DomainToUiSportsMapper,
-    private val countdownTime: CountdownTime
+    private val domainToUiSportsMapper: DomainToUiSportsMapper
 ) : ViewModel() {
 
-    /*var sports by mutableStateOf(SportsUiState())
-        private set*/
     val uiState = mutableStateOf(SportsUiState.LOADING)
 
     var sportsList = mutableStateListOf<UiSport>()
@@ -43,26 +37,6 @@ class SportsViewModel @Inject constructor(
                     uiState.value = SportsUiState.LOADING
                 }
             }
-
-            setDate()
-
-            /*countdownTime(time).onEach {
-                time = it
-                setDate(time = time)
-                println("timeasd -> $time")
-            }.collect()*/
-            /*sports = when (val result = getSportsWithEvents()) {
-                is Resource.Success -> {
-
-                    sports.copy(
-                        data = domainToUiSportsMapper.map(
-                            result.data ?: emptyList()
-                        )
-                    )
-                }
-                is Resource.Error -> TODO()
-            }*/
-
         }
     }
 
@@ -87,23 +61,5 @@ class SportsViewModel @Inject constructor(
             SportsRowState.Expanded
         }
         sportsList[index] = sportsList[index].copy(expanded = expanded)
-    }
-
-    private suspend fun setDate() {
-
-        countdownTime().onEach {
-            val time = it
-            for (sportsIndex in sportsList.indices) {
-
-                val tempList = mutableListOf<UiSportEvent>()
-                for (sportEventsIndex in sportsList[sportsIndex].events.indices) {
-                    tempList.add(
-                        sportsList[sportsIndex].events[sportEventsIndex]
-                            .copy(date = sportsList[sportsIndex].events[sportEventsIndex].date + time)
-                    )
-                }
-                sportsList[sportsIndex] = sportsList[sportsIndex].copy(events = tempList)
-            }
-        }.collect()
     }
 }

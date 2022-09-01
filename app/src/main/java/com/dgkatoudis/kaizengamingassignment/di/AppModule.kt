@@ -26,8 +26,8 @@ object AppModule {
     }
 
     @Provides
-    fun provideSportsEventMapper(): DomainToUiSportEventsMapper {
-        return DomainToUiSportEventsMapper()
+    fun provideSportsEventMapper(dateFormatter: DateFormatter): DomainToUiSportEventsMapper {
+        return DomainToUiSportEventsMapper(dateFormatter)
     }
 
     @Provides
@@ -67,7 +67,7 @@ object AppModule {
     }
 
     @Provides
-    fun provideCountdownTime():CountdownTime{
-        return CountdownTime()
+    fun provideCountdownTime(timer:Long): CountdownTime {
+        return CountdownTime(timer)
     }
 }

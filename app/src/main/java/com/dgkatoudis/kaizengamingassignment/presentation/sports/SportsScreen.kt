@@ -9,6 +9,7 @@ import com.dgkatoudis.kaizengamingassignment.presentation.sports.composables.Sca
 fun SportScreen(
     viewModel: SportsViewModel = hiltViewModel()
 ) {
+
     ScaffoldWithTopBar(
         onExpandIconClick = viewModel::setExpanded,
         onFavoriteIconClick = viewModel::setFavorite,

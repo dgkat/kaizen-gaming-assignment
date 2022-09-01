@@ -11,7 +11,7 @@ class DomainToUiSportEventsMapperTest {
 
     @Before
     fun setup() {
-        domainToUiSportEventsMapper = DomainToUiSportEventsMapper()
+        domainToUiSportEventsMapper = DomainToUiSportEventsMapper(dateFormatter = DateFormatter())
     }
 
     @Test
@@ -26,17 +26,9 @@ class DomainToUiSportEventsMapperTest {
                 )
             )
         )
-        assertThat(result).isEqualTo(
-            listOf(
-                UiSportEvent(
-                    id = "",
-                    team1 = "a",
-                    team2 = "b",
-                    sportId = "",
-                    date = 1
-                )
-            )
-        )
+        assertThat(result[0].team1).isEqualTo("a")
+        assertThat(result[0].team2).isEqualTo("b")
+
     }
 
     @Test
