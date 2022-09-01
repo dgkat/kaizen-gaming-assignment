@@ -7,7 +7,6 @@ import com.dgkatoudis.kaizengamingassignment.data.model.RemoteSport
 import com.dgkatoudis.kaizengamingassignment.domain.model.Resource
 import com.dgkatoudis.kaizengamingassignment.domain.model.Sport
 import com.dgkatoudis.kaizengamingassignment.domain.repository.SportRepository
-import com.dgkatoudis.kaizengamingassignment.presentation.sports.SportsMapper
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types

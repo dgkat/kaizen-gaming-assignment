@@ -2,8 +2,8 @@ package com.dgkatoudis.kaizengamingassignment.presentation.sports
 
 import com.dgkatoudis.kaizengamingassignment.domain.model.SportEvent
 
-class SportsEventMapper(
-    private val dateFormatter: DateFormatter
+class DomainToUiSportEventsMapper(
+    /*private val dateFormatter: DateFormatter*/
 ) {
     fun map(events: List<SportEvent>): List<UiSportEvent> {
         return events.map {
@@ -20,6 +20,11 @@ class SportsEventMapper(
 
     private fun getTeams(sportEventName: String): UiTeams {
         val teams = sportEventName.split("-")
-        return UiTeams(team1 = teams[0].trim(), team2 = teams[1].trim())
+
+        return if (teams.size<=1) {
+            UiTeams(team1 = teams[0].trim(), team2 = "")
+        } else {
+            UiTeams(team1 = teams[0].trim(), team2 = teams[1].trim())
+        }
     }
 }

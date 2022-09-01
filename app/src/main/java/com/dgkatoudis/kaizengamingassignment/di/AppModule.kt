@@ -8,8 +8,8 @@ import com.dgkatoudis.kaizengamingassignment.domain.repository.SportRepository
 import com.dgkatoudis.kaizengamingassignment.domain.usecases.CountdownTime
 import com.dgkatoudis.kaizengamingassignment.domain.usecases.GetSportsWithEvents
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.DateFormatter
-import com.dgkatoudis.kaizengamingassignment.presentation.sports.SportsEventMapper
-import com.dgkatoudis.kaizengamingassignment.presentation.sports.SportsMapper
+import com.dgkatoudis.kaizengamingassignment.presentation.sports.DomainToUiSportEventsMapper
+import com.dgkatoudis.kaizengamingassignment.presentation.sports.DomainToUiSportsMapper
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -26,13 +26,13 @@ object AppModule {
     }
 
     @Provides
-    fun provideSportsEventMapper(dateFormatter: DateFormatter): SportsEventMapper {
-        return SportsEventMapper(dateFormatter)
+    fun provideSportsEventMapper(): DomainToUiSportEventsMapper {
+        return DomainToUiSportEventsMapper()
     }
 
     @Provides
-    fun provideSportsMapper(sportsEventMapper: SportsEventMapper): SportsMapper {
-        return SportsMapper(sportsEventMapper)
+    fun provideSportsMapper(domainToUiSportEventsMapper: DomainToUiSportEventsMapper): DomainToUiSportsMapper {
+        return DomainToUiSportsMapper(domainToUiSportEventsMapper)
     }
 
     @Provides

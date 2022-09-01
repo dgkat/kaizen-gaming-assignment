@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SportsViewModel @Inject constructor(
     private val getSportsWithEvents: GetSportsWithEvents,
-    private val sportsMapper: SportsMapper,
+    private val domainToUiSportsMapper: DomainToUiSportsMapper,
     private val countdownTime: CountdownTime
 ) : ViewModel() {
 
@@ -34,7 +34,7 @@ class SportsViewModel @Inject constructor(
             when (val result = getSportsWithEvents()) {
                 is Resource.Success -> {
                     uiState.value = SportsUiState.SUCCESS
-                    sportsList.addAll(sportsMapper.map(result.data ?: emptyList()))
+                    sportsList.addAll(domainToUiSportsMapper.map(result.data ?: emptyList()))
                 }
                 is Resource.Error -> {
                     uiState.value = SportsUiState.ERROR
@@ -55,7 +55,7 @@ class SportsViewModel @Inject constructor(
                 is Resource.Success -> {
 
                     sports.copy(
-                        data = sportsMapper.map(
+                        data = domainToUiSportsMapper.map(
                             result.data ?: emptyList()
                         )
                     )
