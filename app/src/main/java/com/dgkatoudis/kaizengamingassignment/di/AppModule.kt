@@ -10,6 +10,8 @@ import com.dgkatoudis.kaizengamingassignment.domain.usecases.GetSportsWithEvents
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.DateFormatter
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.DomainToUiSportEventsMapper
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.DomainToUiSportsMapper
+import com.dgkatoudis.kaizengamingassignment.util.DispatcherProvider
+import com.dgkatoudis.kaizengamingassignment.util.DispatcherProviderImpl
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -44,9 +46,10 @@ object AppModule {
     fun provideSportsRepository(
         moshi: Moshi,
         context: Application,
-        remoteToDomainSportsMapper: RemoteToDomainSportsMapper
+        remoteToDomainSportsMapper: RemoteToDomainSportsMapper,
+        dispatcherProvider: DispatcherProvider
     ): SportRepository {
-        return SportRepositoryImpl(moshi, context, remoteToDomainSportsMapper)
+        return SportRepositoryImpl(moshi, context, remoteToDomainSportsMapper, dispatcherProvider)
     }
 
     @Provides
@@ -67,7 +70,12 @@ object AppModule {
     }
 
     @Provides
-    fun provideCountdownTime(timer:Long): CountdownTime {
+    fun provideCountdownTime(timer: Long): CountdownTime {
         return CountdownTime(timer)
+    }
+
+    @Provides
+    fun provideDispatcherProvider(): DispatcherProvider {
+        return DispatcherProviderImpl()
     }
 }
