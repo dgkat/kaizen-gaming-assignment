@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dgkatoudis.kaizengamingassignment.R
 import com.dgkatoudis.kaizengamingassignment.presentation.sports.UiSportEvent
 
@@ -21,7 +21,8 @@ fun SportEvent(
     sportEventIndex: Int,
     onFavoriteIconClick: (Int, Int) -> Unit
 ) {
-    val countDownFlow = sportEvent.date.collectAsState(initial = stringResource(R.string.date))
+    val countDownFlow =
+        sportEvent.date.collectAsStateWithLifecycle(initialValue = stringResource(R.string.date))
 
     Surface(
         modifier = Modifier,
@@ -45,5 +46,4 @@ fun SportEvent(
             TeamName(teamName = sportEvent.team2)
         }
     }
-
 }
